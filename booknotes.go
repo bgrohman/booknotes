@@ -19,8 +19,8 @@ func help() {
     fmt.Println("booknotes [command]")
     fmt.Println("")
     fmt.Println("Commands:")
-    fmt.Println("list      Prints title, subtitle, and author for each book")
-    fmt.Println("full      Same as \"list\" but includes word count and file path")
+    fmt.Println("list      Prints title, subtitle, author, and metadata for each book")
+    fmt.Println("full      Same as \"list\" but includes the full notes, too")
     fmt.Println("authors   Prints all authors in alphabetical order")
     fmt.Println("titles    Prints all titles in alphabetical order")
     fmt.Println("words     Prints words and word counts")
@@ -247,12 +247,19 @@ func list(full bool) {
 
         fmt.Println("Author:", meta.author)
 
+        notes := getNotesFromFile(meta.path)
+        fmt.Println("Note Count:", len(notes))
+
+        wordCount := len(getAllWordsFromFile(meta.path))
+        fmt.Println("Word Count:", wordCount)
+        fmt.Println("Path:", meta.path)
+
         if full {
-            notes := getNotesFromFile(meta.path)
-            fmt.Println("Note Count:", len(notes))
-            wordCount := len(getAllWordsFromFile(meta.path))
-            fmt.Println("Word Count:", wordCount)
-            fmt.Println("Path:", meta.path)
+            fmt.Println("Notes:")
+            for _, note := range notes {
+                fmt.Println(note)
+                fmt.Println("")
+            }
         }
 
         fmt.Println("")
