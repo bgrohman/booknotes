@@ -27,15 +27,15 @@ func help() {
     fmt.Println("")
 }
 
-type meta struct {
+type Meta struct {
     title string
     subtitle string
     author string
     path string
 }
 
-func getMetaInfo() []meta {
-    var info []meta
+func getMetaInfo() []Meta {
+    var info []Meta
 
     files, err := ioutil.ReadDir(DIRECTORY)
     if err != nil {
@@ -66,7 +66,7 @@ func getMetaInfo() []meta {
                 }
 
                 author = strings.TrimPrefix(author, AUTHOR_PREFIX)
-                info = append(info, meta{title, subtitle, author, path})
+                info = append(info, Meta{title, subtitle, author, path})
             }
         }
     }
@@ -98,6 +98,21 @@ func (p WordCountPairList) Less(i, j int) bool {
     return p[i].count < p[j].count
 }
 
+var SKIP_WORDS = [...]string {"this", "that", "what", "have", "with", "your", "from", "they", "which", "when", "their", "there", "than", "it's", "were", "them"}
+
+func isSkipWord(word string) bool {
+    result := false
+
+    for _, s := range SKIP_WORDS {
+        if s == word {
+            result = true
+            break
+        }
+    }
+
+    return result
+}
+
 func wordCount() {
     wordCounts := make(map[string]int)
 
@@ -127,7 +142,7 @@ func wordCount() {
 
                     if match == false {
                         sanitized := sanitizeWordForCount(word)
-                        if len(sanitized) > 0 {
+                        if len(sanitized) >= 4 && isSkipWord(sanitized) == false {
                             words = append(words, sanitized)
                         }
                     }
