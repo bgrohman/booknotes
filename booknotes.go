@@ -16,9 +16,12 @@ const DIRECTORY = "/home/bryan/Documents/book_notes/"
 const AUTHOR_PREFIX = "by "
 
 func help() {
+    fmt.Println("Usage:")
+    fmt.Println("------")
     fmt.Println("booknotes [command]")
     fmt.Println("")
     fmt.Println("Commands:")
+    fmt.Println("---------")
     fmt.Println("list      Prints title, subtitle, author, and metadata for each book")
     fmt.Println("full      Same as \"list\" but includes the full notes, too")
     fmt.Println("authors   Prints all authors in alphabetical order")
@@ -35,7 +38,7 @@ type Meta struct {
     path string
 }
 
-func getMetaInfo() []Meta {
+func getMetaInfo(whichFile string) []Meta {
     var info []Meta
 
     files, err := ioutil.ReadDir(DIRECTORY)
@@ -46,28 +49,31 @@ func getMetaInfo() []Meta {
     for _, f := range files {
         if strings.HasSuffix(f.Name(), ".txt") {
             path := DIRECTORY + f.Name()
-            byteContents, fileErr := ioutil.ReadFile(path)
 
-            if fileErr != nil {
-                log.Fatal(fileErr)
-            } else {
-                contents := string(byteContents)
-                lines := strings.Split(contents, "\n")
+            if len(whichFile) < 1 || whichFile == path {
+                byteContents, fileErr := ioutil.ReadFile(path)
 
-                title := lines[1]
-                subtitle := lines[2]
-                author := lines[2]
-
-                if strings.HasPrefix(lines[2], AUTHOR_PREFIX) {
-                    author = lines[2]
-                    subtitle = ""
+                if fileErr != nil {
+                    log.Fatal(fileErr)
                 } else {
-                    subtitle = lines[2]
-                    author = lines[3]
-                }
+                    contents := string(byteContents)
+                    lines := strings.Split(contents, "\n")
 
-                author = strings.TrimPrefix(author, AUTHOR_PREFIX)
-                info = append(info, Meta{title, subtitle, author, path})
+                    title := lines[1]
+                    subtitle := lines[2]
+                    author := lines[2]
+
+                    if strings.HasPrefix(lines[2], AUTHOR_PREFIX) {
+                        author = lines[2]
+                        subtitle = ""
+                    } else {
+                        subtitle = lines[2]
+                        author = lines[3]
+                    }
+
+                    author = strings.TrimPrefix(author, AUTHOR_PREFIX)
+                    info = append(info, Meta{title, subtitle, author, path})
+                }
             }
         }
     }
@@ -156,7 +162,7 @@ func getNotesFromFile(path string) []string {
             }
 
             if isBlank == false {
-                currentBlock = currentBlock + line
+                currentBlock = currentBlock + " " + line
             } else {
                 if len(currentBlock) > 0 {
                     currentBlock = regexp.MustCompile("\r?\n").ReplaceAllString(currentBlock, " ")
@@ -206,7 +212,7 @@ func getAllWordsFromFile(path string) []string {
     return words
 }
 
-func wordCount() {
+func wordCount(whichFile string) {
     wordCounts := make(map[string]int)
 
     files, err := ioutil.ReadDir(DIRECTORY)
@@ -216,10 +222,14 @@ func wordCount() {
 
     for _, f := range files {
         if strings.HasSuffix(f.Name(), ".txt") {
-            words := getAllWordsFromFile(DIRECTORY + f.Name())
+            path := DIRECTORY + f.Name()
 
-            for _, word := range words {
-                wordCounts[word] = wordCounts[word] + 1
+            if len(whichFile) < 1 || whichFile == path {
+                words := getAllWordsFromFile(path)
+
+                for _, word := range words {
+                    wordCounts[word] = wordCounts[word] + 1
+                }
             }
         }
     }
@@ -237,8 +247,8 @@ func wordCount() {
     }
 }
 
-func list(full bool) {
-    for _, meta := range getMetaInfo() {
+func list(full bool, whichFile string) {
+    for _, meta := range getMetaInfo(whichFile) {
         fmt.Println("Title:", meta.title)
 
         if utf8.RuneCountInString(meta.subtitle) > 0 {
@@ -269,7 +279,7 @@ func list(full bool) {
 func printSortedProperties(property string) {
     resultMap := make(map[string]bool)
 
-    for _, meta := range getMetaInfo() {
+    for _, meta := range getMetaInfo("") {
         switch property {
         case "author":
             resultMap[meta.author] = true
@@ -294,17 +304,22 @@ func main() {
     args := os.Args[1:]
 
     if len(args) > 0 {
+        file := ""
+        if len(args) >= 2 {
+            file = args[1]
+        }
+
         switch args[0] {
         case "list":
-            list(false)
+            list(false, file)
         case "full":
-            list(true)
+            list(true, file)
         case "authors":
             printSortedProperties("author")
         case "titles":
             printSortedProperties("title")
         case "words":
-            wordCount()
+            wordCount(file)
         case "help":
             help()
         }
