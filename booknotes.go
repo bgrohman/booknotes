@@ -76,10 +76,9 @@ func getMetaInfo() []meta {
 
 func sanitizeWordForCount(word string) string {
     lower := strings.ToLower(word)
-    // TODO: Not working...
-    sanitized := regexp.MustCompile("^[\\(\"\\'\\.\\,\\?\\!]*(.*)[\\)\"\\'\\.\\,\\?\\!]*$").ReplaceAllString(lower, "$1")
-    //sanitized := regexp.MustCompile("^[[[:punct:]]\\?\"\\']*(.*)[[[:punct:]]\\?\"\\']*$").ReplaceAllString(lower, "$1")
-    //sanitized := regexp.MustCompile("^[\\pP[[:punct:]]]*(.*)[\\pP[[:punct:]]]*$").ReplaceAllString(lower, "$1")
+    punctuation := "()[]:;,.?!\"'"
+    sanitized := strings.TrimRight(lower, punctuation)
+    sanitized = strings.TrimLeft(sanitized, punctuation)
     return sanitized
 }
 
@@ -128,7 +127,9 @@ func wordCount() {
 
                     if match == false {
                         sanitized := sanitizeWordForCount(word)
-                        words = append(words, sanitized)
+                        if len(sanitized) > 0 {
+                            words = append(words, sanitized)
+                        }
                     }
                 }
 
