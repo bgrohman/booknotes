@@ -5,6 +5,7 @@ import (
     "io/ioutil"
     "log"
     "os"
+    "regexp"
     "sort"
     "strings"
     "unicode/utf8"
@@ -21,6 +22,7 @@ func help() {
     fmt.Println("full      Same as \"list\" but includes file path")
     fmt.Println("authors   Prints all authors in alphabetical order")
     fmt.Println("titles    Prints all titles in alphabetical order")
+    fmt.Println("words     Prints words and word counts")
     fmt.Println("help      Prints this help message")
     fmt.Println("")
 }
@@ -70,6 +72,84 @@ func getMetaInfo() []meta {
     }
 
     return info
+}
+
+func sanitizeWordForCount(word string) string {
+    lower := strings.ToLower(word)
+    // TODO: Not working...
+    sanitized := regexp.MustCompile("^[\\(\"\\'\\.\\,\\?\\!]*(.*)[\\)\"\\'\\.\\,\\?\\!]*$").ReplaceAllString(lower, "$1")
+    //sanitized := regexp.MustCompile("^[[[:punct:]]\\?\"\\']*(.*)[[[:punct:]]\\?\"\\']*$").ReplaceAllString(lower, "$1")
+    //sanitized := regexp.MustCompile("^[\\pP[[:punct:]]]*(.*)[\\pP[[:punct:]]]*$").ReplaceAllString(lower, "$1")
+    return sanitized
+}
+
+type WordCountPair struct {
+    word string
+    count int
+}
+
+type WordCountPairList []WordCountPair
+func (p WordCountPairList) Swap(i, j int) {
+    p[i], p[j] = p[j], p[i]
+}
+func (p WordCountPairList) Len() int {
+    return len(p)
+}
+func (p WordCountPairList) Less(i, j int) bool {
+    return p[i].count < p[j].count
+}
+
+func wordCount() {
+    wordCounts := make(map[string]int)
+
+    files, err := ioutil.ReadDir(DIRECTORY)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    for _, f := range files {
+        if strings.HasSuffix(f.Name(), ".txt") {
+            path := DIRECTORY + f.Name()
+            byteContents, fileErr := ioutil.ReadFile(path)
+
+            if fileErr != nil {
+                log.Fatal(fileErr)
+            } else {
+                contents := string(byteContents)
+                allWords := regexp.MustCompile("\\s").Split(contents, -1)
+
+                var words []string
+                for _, word := range allWords {
+                    match, matchErr := regexp.MatchString("=+", word)
+
+                    if matchErr != nil {
+                        log.Fatal(matchErr)
+                    }
+
+                    if match == false {
+                        sanitized := sanitizeWordForCount(word)
+                        words = append(words, sanitized)
+                    }
+                }
+
+                for _, word := range words {
+                    wordCounts[word] = wordCounts[word] + 1
+                }
+            }
+        }
+    }
+
+    pairs := make(WordCountPairList, len(wordCounts))
+    i := 0
+    for k, v := range wordCounts {
+        pairs[i] = WordCountPair{k, v}
+        i = i + 1
+    }
+    sort.Sort(pairs)
+
+    for _, value := range pairs {
+        fmt.Println(value.word, value.count)
+    }
 }
 
 func list(full bool) {
@@ -127,6 +207,8 @@ func main() {
             printSortedProperties("author")
         case "titles":
             printSortedProperties("title")
+        case "words":
+            wordCount()
         case "help":
             help()
         }
