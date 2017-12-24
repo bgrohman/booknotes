@@ -18,7 +18,7 @@ const AUTHOR_PREFIX = "by "
 func help() {
     fmt.Println("Usage:")
     fmt.Println("------")
-    fmt.Println("booknotes [command]")
+    fmt.Println("booknotes <command> [file]")
     fmt.Println("")
     fmt.Println("Commands:")
     fmt.Println("---------")
@@ -28,6 +28,10 @@ func help() {
     fmt.Println("titles    Prints all titles in alphabetical order")
     fmt.Println("words     Prints words and word counts")
     fmt.Println("help      Prints this help message")
+    fmt.Println("")
+    fmt.Println("Options:")
+    fmt.Println("--------")
+    fmt.Println("file      Optional file path to process instead of all books")
     fmt.Println("")
 }
 
