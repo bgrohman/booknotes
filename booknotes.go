@@ -3,9 +3,8 @@ package main
 import (
     "fmt"
     "os"
+    "booknotes/parsing"
 )
-
-const DIRECTORY = "/home/bryan/Documents/book_notes/"
 
 func help() {
     fmt.Println("Usage:")
@@ -38,15 +37,15 @@ func main() {
 
         switch args[0] {
         case "list":
-            list(false, file)
+            parsing.List(false, file)
         case "full":
-            list(true, file)
+            parsing.List(true, file)
         case "authors":
-            printSortedProperties("author")
+            parsing.PrintSortedProperties("author")
         case "titles":
-            printSortedProperties("title")
+            parsing.PrintSortedProperties("title")
         case "words":
-            wordCount(file)
+            parsing.WordCount(file)
         case "help":
             help()
         }

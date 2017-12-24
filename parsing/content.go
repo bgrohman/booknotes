@@ -1,4 +1,4 @@
-package main
+package parsing
 
 import (
     "bufio"
@@ -9,60 +9,7 @@ import (
     "regexp"
     "sort"
     "strings"
-    "unicode/utf8"
 )
-
-const AUTHOR_PREFIX = "by "
-
-type Meta struct {
-    title string
-    subtitle string
-    author string
-    path string
-}
-
-func getMetaInfo(whichFile string) []Meta {
-    var info []Meta
-
-    files, err := ioutil.ReadDir(DIRECTORY)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    for _, f := range files {
-        if strings.HasSuffix(f.Name(), ".txt") {
-            path := DIRECTORY + f.Name()
-
-            if len(whichFile) < 1 || whichFile == path {
-                byteContents, fileErr := ioutil.ReadFile(path)
-
-                if fileErr != nil {
-                    log.Fatal(fileErr)
-                } else {
-                    contents := string(byteContents)
-                    lines := strings.Split(contents, "\n")
-
-                    title := lines[1]
-                    subtitle := lines[2]
-                    author := lines[2]
-
-                    if strings.HasPrefix(lines[2], AUTHOR_PREFIX) {
-                        author = lines[2]
-                        subtitle = ""
-                    } else {
-                        subtitle = lines[2]
-                        author = lines[3]
-                    }
-
-                    author = strings.TrimPrefix(author, AUTHOR_PREFIX)
-                    info = append(info, Meta{title, subtitle, author, path})
-                }
-            }
-        }
-    }
-
-    return info
-}
 
 func sanitizeWordForCount(word string) string {
     lower := strings.ToLower(word)
@@ -103,7 +50,7 @@ func isSkipWord(word string) bool {
     return result
 }
 
-func getNotesFromFile(path string) []string {
+func GetNotesFromFile(path string) []string {
     var notes []string
 
     file, fileErr := os.Open(path)
@@ -172,7 +119,7 @@ func getNotesFromFile(path string) []string {
     return notes
 }
 
-func getAllWordsFromFile(path string) []string {
+func GetAllWordsFromFile(path string) []string {
     var words []string
     byteContents, fileErr := ioutil.ReadFile(path)
 
@@ -199,7 +146,7 @@ func getAllWordsFromFile(path string) []string {
     return words
 }
 
-func wordCount(whichFile string) {
+func WordCount(whichFile string) {
     wordCounts := make(map[string]int)
 
     files, err := ioutil.ReadDir(DIRECTORY)
@@ -212,7 +159,7 @@ func wordCount(whichFile string) {
             path := DIRECTORY + f.Name()
 
             if len(whichFile) < 1 || whichFile == path {
-                words := getAllWordsFromFile(path)
+                words := GetAllWordsFromFile(path)
 
                 for _, word := range words {
                     wordCounts[word] = wordCounts[word] + 1
@@ -231,58 +178,5 @@ func wordCount(whichFile string) {
 
     for _, value := range pairs {
         fmt.Println(value.word, value.count)
-    }
-}
-
-func list(full bool, whichFile string) {
-    for _, meta := range getMetaInfo(whichFile) {
-        fmt.Println("Title:", meta.title)
-
-        if utf8.RuneCountInString(meta.subtitle) > 0 {
-            fmt.Println("Subtitle:", meta.subtitle)
-        }
-
-        fmt.Println("Author:", meta.author)
-
-        notes := getNotesFromFile(meta.path)
-        fmt.Println("Note Count:", len(notes))
-
-        wordCount := len(getAllWordsFromFile(meta.path))
-        fmt.Println("Word Count:", wordCount)
-        fmt.Println("Path:", meta.path)
-
-        if full {
-            fmt.Println("Notes:")
-            for _, note := range notes {
-                fmt.Println(note)
-                fmt.Println("")
-            }
-        }
-
-        fmt.Println("")
-    }
-}
-
-func printSortedProperties(property string) {
-    resultMap := make(map[string]bool)
-
-    for _, meta := range getMetaInfo("") {
-        switch property {
-        case "author":
-            resultMap[meta.author] = true
-        case "title":
-            resultMap[meta.title] = true
-        }
-    }
-
-    results := make([]string, 0, len(resultMap))
-    for key := range resultMap {
-        results = append(results, key)
-    }
-
-    sort.Strings(results)
-
-    for _, result := range results {
-        fmt.Println(result)
     }
 }
