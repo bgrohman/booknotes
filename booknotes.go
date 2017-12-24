@@ -113,6 +113,33 @@ func isSkipWord(word string) bool {
     return result
 }
 
+func getAllWordsFromFile(path string) []string {
+    var words []string
+    byteContents, fileErr := ioutil.ReadFile(path)
+
+    if fileErr != nil {
+        log.Fatal(fileErr)
+    } else {
+        contents := string(byteContents)
+        allWords := regexp.MustCompile("\\s").Split(contents, -1)
+
+        for _, word := range allWords {
+            match, matchErr := regexp.MatchString("=+", word)
+
+            if matchErr != nil {
+                log.Fatal(matchErr)
+            }
+
+            if match == false && len(word) >= 4 && isSkipWord(word) == false {
+                sanitized := sanitizeWordForCount(word)
+                words = append(words, sanitized)
+            }
+        }
+    }
+
+    return words
+}
+
 func wordCount() {
     wordCounts := make(map[string]int)
 
@@ -123,34 +150,10 @@ func wordCount() {
 
     for _, f := range files {
         if strings.HasSuffix(f.Name(), ".txt") {
-            path := DIRECTORY + f.Name()
-            byteContents, fileErr := ioutil.ReadFile(path)
+            words := getAllWordsFromFile(DIRECTORY + f.Name())
 
-            if fileErr != nil {
-                log.Fatal(fileErr)
-            } else {
-                contents := string(byteContents)
-                allWords := regexp.MustCompile("\\s").Split(contents, -1)
-
-                var words []string
-                for _, word := range allWords {
-                    match, matchErr := regexp.MatchString("=+", word)
-
-                    if matchErr != nil {
-                        log.Fatal(matchErr)
-                    }
-
-                    if match == false {
-                        sanitized := sanitizeWordForCount(word)
-                        if len(sanitized) >= 4 && isSkipWord(sanitized) == false {
-                            words = append(words, sanitized)
-                        }
-                    }
-                }
-
-                for _, word := range words {
-                    wordCounts[word] = wordCounts[word] + 1
-                }
+            for _, word := range words {
+                wordCounts[word] = wordCounts[word] + 1
             }
         }
     }
@@ -170,16 +173,18 @@ func wordCount() {
 
 func list(full bool) {
     for _, meta := range getMetaInfo() {
-        fmt.Println(meta.title)
+        fmt.Println("Title:", meta.title)
 
         if utf8.RuneCountInString(meta.subtitle) > 0 {
-            fmt.Println(meta.subtitle)
+            fmt.Println("Subtitle:", meta.subtitle)
         }
 
-        fmt.Println("by", meta.author)
+        fmt.Println("Author:", meta.author)
 
         if full {
-            fmt.Println(meta.path)
+            wordCount := len(getAllWordsFromFile(meta.path))
+            fmt.Println("Word Count:", wordCount)
+            fmt.Println("Path:", meta.path)
         }
 
         fmt.Println("")
