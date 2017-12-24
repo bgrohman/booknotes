@@ -1,6 +1,7 @@
 package main
 
 import (
+    "bufio"
     "fmt"
     "io/ioutil"
     "log"
@@ -19,7 +20,7 @@ func help() {
     fmt.Println("")
     fmt.Println("Commands:")
     fmt.Println("list      Prints title, subtitle, and author for each book")
-    fmt.Println("full      Same as \"list\" but includes file path")
+    fmt.Println("full      Same as \"list\" but includes word count and file path")
     fmt.Println("authors   Prints all authors in alphabetical order")
     fmt.Println("titles    Prints all titles in alphabetical order")
     fmt.Println("words     Prints words and word counts")
@@ -113,6 +114,71 @@ func isSkipWord(word string) bool {
     return result
 }
 
+func getNotesFromFile(path string) []string {
+    var notes []string
+
+    file, fileErr := os.Open(path)
+    defer file.Close()
+
+    if fileErr != nil {
+        log.Fatal(fileErr)
+    }
+
+    currentBlock := ""
+    metaCount := 0
+    isMeta := false
+
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        line := scanner.Text()
+
+        isMetaSeparator, matchErr := regexp.MatchString("=+", line)
+        if matchErr != nil {
+            log.Fatal(matchErr)
+        }
+
+        if isMetaSeparator == true {
+            metaCount = metaCount + 1
+
+            if metaCount <= 1 {
+                isMeta = true
+            } else {
+                isMeta = false
+            }
+
+            continue
+        }
+
+        if isMeta == false {
+            isBlank, matchErr := regexp.MatchString("^\\s*$", line)
+            if matchErr != nil {
+                log.Fatal(matchErr)
+            }
+
+            if isBlank == false {
+                currentBlock = currentBlock + line
+            } else {
+                if len(currentBlock) > 0 {
+                    currentBlock = regexp.MustCompile("\r?\n").ReplaceAllString(currentBlock, " ")
+                    notes = append(notes, currentBlock)
+                    currentBlock = ""
+                }
+            }
+        }
+    }
+
+    if len(currentBlock) > 0 {
+        currentBlock = regexp.MustCompile("\r?\n").ReplaceAllString(currentBlock, " ")
+        notes = append(notes, currentBlock)
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Fatal(err)
+    }
+
+    return notes
+}
+
 func getAllWordsFromFile(path string) []string {
     var words []string
     byteContents, fileErr := ioutil.ReadFile(path)
@@ -182,6 +248,8 @@ func list(full bool) {
         fmt.Println("Author:", meta.author)
 
         if full {
+            notes := getNotesFromFile(meta.path)
+            fmt.Println("Note Count:", len(notes))
             wordCount := len(getAllWordsFromFile(meta.path))
             fmt.Println("Word Count:", wordCount)
             fmt.Println("Path:", meta.path)
