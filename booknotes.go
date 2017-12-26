@@ -18,6 +18,7 @@ func help() {
     fmt.Println("authors   Prints all authors in alphabetical order")
     fmt.Println("titles    Prints all titles in alphabetical order")
     fmt.Println("words     Prints words and word counts")
+    fmt.Println("random    Prints a random note")
     fmt.Println("help      Prints this help message")
     fmt.Println("")
     fmt.Println("Options:")
@@ -46,6 +47,8 @@ func main() {
             parsing.PrintSortedProperties("title")
         case "words":
             parsing.WordCount(file)
+        case "random":
+            parsing.RandomNote(file)
         case "help":
             help()
         }

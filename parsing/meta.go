@@ -4,8 +4,10 @@ import (
     "fmt"
     "io/ioutil"
     "log"
+    "math/rand"
     "sort"
     "strings"
+    "time"
     "unicode/utf8"
 )
 
@@ -110,4 +112,35 @@ func List(full bool, whichFile string) {
 
         fmt.Println("")
     }
+}
+
+func RandomNote(whichFile string) {
+    rand.Seed(time.Now().Unix())
+    file := whichFile
+
+    if len(whichFile) < 1 {
+        files, err := ioutil.ReadDir(DIRECTORY)
+        if err != nil {
+            log.Fatal(err)
+        }
+
+        randomFileIndex := rand.Intn(len(files) - 1)
+        file = DIRECTORY + files[randomFileIndex].Name()
+    }
+
+    notes := GetNotesFromFile(file)
+    randomNoteIndex := 0
+    if len(notes) > 1 {
+        randomNoteIndex = rand.Intn(len(notes) - 1)
+    }
+    note := notes[randomNoteIndex]
+    meta := GetMetaInfo(file)[0]
+
+    fmt.Println("Title:", meta.Title)
+    if utf8.RuneCountInString(meta.Subtitle) > 0 {
+        fmt.Println("Subtitle:", meta.Subtitle)
+    }
+    fmt.Println("Author:", meta.Author)
+    fmt.Println("")
+    fmt.Println(note)
 }
