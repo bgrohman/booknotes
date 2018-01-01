@@ -3,7 +3,7 @@ package main
 import (
     "fmt"
     "os"
-    "booknotes/parsing"
+    "booknotes/core"
 )
 
 func help() {
@@ -38,17 +38,17 @@ func main() {
 
         switch args[0] {
         case "list":
-            parsing.List(false, file)
+            core.List(false, file)
         case "full":
-            parsing.List(true, file)
+            core.List(true, file)
         case "authors":
-            parsing.PrintSortedProperties("author")
+            core.PrintSortedProperties("author")
         case "titles":
-            parsing.PrintSortedProperties("title")
+            core.PrintSortedProperties("title")
         case "words":
-            parsing.WordCount(file)
+            core.WordCount(file)
         case "random":
-            parsing.RandomNote(file)
+            core.RandomNote(file)
         case "help":
             help()
         }
