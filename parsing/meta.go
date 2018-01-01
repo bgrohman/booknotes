@@ -1,6 +1,7 @@
 package parsing
 
 import (
+    "booknotes/printing"
     "fmt"
     "io/ioutil"
     "log"
@@ -105,8 +106,7 @@ func List(full bool, whichFile string) {
         if full {
             fmt.Println("Notes:")
             for _, note := range notes {
-                fmt.Println(note)
-                fmt.Println("")
+                printing.PrintNote(note)
             }
         }
 
@@ -142,5 +142,5 @@ func RandomNote(whichFile string) {
     }
     fmt.Println("Author:", meta.Author)
     fmt.Println("")
-    fmt.Println(note)
+    printing.PrintNote(note)
 }
