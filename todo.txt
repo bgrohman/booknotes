@@ -1,4 +1,0 @@
-1. Pass options in via environment variables.
-    a. Path to book notes
-    b. Max line length when printing notes
-2. Unit testing
