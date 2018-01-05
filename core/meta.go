@@ -1,6 +1,7 @@
 package core
 
 import (
+    "booknotes/config"
     "booknotes/printing"
     "fmt"
     "io/ioutil"
@@ -22,14 +23,14 @@ type Meta struct {
 func GetMetaInfo(whichFile string) []Meta {
     var info []Meta
 
-    files, err := ioutil.ReadDir(DIRECTORY)
+    files, err := ioutil.ReadDir(config.GetConfig().Directory)
     if err != nil {
         log.Fatal(err)
     }
 
     for _, f := range files {
         if strings.HasSuffix(f.Name(), ".txt") {
-            path := DIRECTORY + f.Name()
+            path := config.GetConfig().Directory + f.Name()
 
             if len(whichFile) < 1 || whichFile == path {
                 byteContents, fileErr := ioutil.ReadFile(path)
@@ -44,7 +45,7 @@ func GetMetaInfo(whichFile string) []Meta {
                     subtitle := lines[2]
                     author := lines[2]
 
-                    if strings.HasPrefix(lines[2], AUTHOR_PREFIX) {
+                    if strings.HasPrefix(lines[2], config.GetConfig().AuthorPrefix) {
                         author = lines[2]
                         subtitle = ""
                     } else {
@@ -52,7 +53,7 @@ func GetMetaInfo(whichFile string) []Meta {
                         author = lines[3]
                     }
 
-                    author = strings.TrimPrefix(author, AUTHOR_PREFIX)
+                    author = strings.TrimPrefix(author, config.GetConfig().AuthorPrefix)
                     info = append(info, Meta{title, subtitle, author, path})
                 }
             }
@@ -119,13 +120,13 @@ func RandomNote(whichFile string) {
     file := whichFile
 
     if len(whichFile) < 1 {
-        files, err := ioutil.ReadDir(DIRECTORY)
+        files, err := ioutil.ReadDir(config.GetConfig().Directory)
         if err != nil {
             log.Fatal(err)
         }
 
         randomFileIndex := rand.Intn(len(files) - 1)
-        file = DIRECTORY + files[randomFileIndex].Name()
+        file = config.GetConfig().Directory + files[randomFileIndex].Name()
     }
 
     notes := GetNotesFromFile(file)

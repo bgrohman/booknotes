@@ -1,6 +1,7 @@
 package printing
 
 import (
+    "booknotes/config"
     "fmt"
     "log"
     "math"
@@ -59,7 +60,14 @@ func isBlank(s string) bool {
 }
 
 func PrintNote(note string) {
-    cols := GetTerminalColumnCount() - 1
+    var cols int
+    terminalCols := GetTerminalColumnCount() - 1
+    maxLineLength := config.GetConfig().MaxLineLength
+    if terminalCols < 1 || maxLineLength < terminalCols {
+        cols = maxLineLength
+    } else {
+        cols = terminalCols
+    }
 
     if cols > 0 {
         noteLength := len(note)

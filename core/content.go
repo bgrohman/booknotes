@@ -1,6 +1,7 @@
 package core
 
 import (
+    "booknotes/config"
     "bufio"
     "fmt"
     "io/ioutil"
@@ -149,14 +150,14 @@ func GetAllWordsFromFile(path string) []string {
 func WordCount(whichFile string) {
     wordCounts := make(map[string]int)
 
-    files, err := ioutil.ReadDir(DIRECTORY)
+    files, err := ioutil.ReadDir(config.GetConfig().Directory)
     if err != nil {
         log.Fatal(err)
     }
 
     for _, f := range files {
         if strings.HasSuffix(f.Name(), ".txt") {
-            path := DIRECTORY + f.Name()
+            path := config.GetConfig().Directory + f.Name()
 
             if len(whichFile) < 1 || whichFile == path {
                 words := GetAllWordsFromFile(path)

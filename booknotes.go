@@ -25,6 +25,11 @@ func help() {
     fmt.Println("--------")
     fmt.Println("file      Optional file path to process instead of all books")
     fmt.Println("")
+    fmt.Println("Environment Variables:")
+    fmt.Println("----------------------")
+    fmt.Println("BOOKNOTES_DIRECTORY        Path to directory containing book note files")
+    fmt.Println("BOOKNOTES_MAX_LINE_LENGTH  Maximum number of columns when printing notes")
+    fmt.Println("")
 }
 
 func main() {
