@@ -4,6 +4,7 @@ import (
     "fmt"
     "os"
     "booknotes/core"
+    "booknotes/printing"
 )
 
 func help() {
@@ -33,6 +34,7 @@ func help() {
 }
 
 func main() {
+    printing.PrintBanner()
     args := os.Args[1:]
 
     if len(args) > 0 {

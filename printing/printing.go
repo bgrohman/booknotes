@@ -12,6 +12,29 @@ import (
     "strings"
 )
 
+func PrintBanner() {
+    fmt.Println("")
+    //fmt.Println("   ,   ,")
+    //fmt.Println("  /////|")
+    //fmt.Println(" ///// |")
+    //fmt.Println("|~~~|  |")
+    //fmt.Println("|===|  |")
+    //fmt.Println("|   |  |")
+    //fmt.Println("|   |  |")
+    //fmt.Println("|   | /")
+    //fmt.Println("|===|/")
+    //fmt.Println("'---'")
+    //fmt.Println("")
+    fmt.Println("      __...--~~~~~-._   _.-~~~~~--...__")
+    fmt.Println("    //               `V'               \\\\")
+    fmt.Println("   //                 |                 \\\\")
+    fmt.Println("  //__...--~~~~~~-._  |  _.-~~~~~~--...__\\\\")
+    fmt.Println(" //__.....----~~~~._\\ | /_.~~~~----.....__\\\\")
+    fmt.Println("====================\\\\|//====================")
+    fmt.Println("                    `---`")
+    fmt.Println("")
+}
+
 func GetTerminalColumnCount() int {
     columns := -1
     command := exec.Command("stty", "size")
