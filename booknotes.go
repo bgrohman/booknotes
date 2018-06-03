@@ -3,6 +3,8 @@ package main
 import (
     "fmt"
     "os"
+    "path/filepath"
+    "booknotes/config"
     "booknotes/core"
     "booknotes/printing"
 )
@@ -33,6 +35,32 @@ func help() {
     fmt.Println("")
 }
 
+func getFilePath(file string) string {
+    filePath, err := filepath.Abs(file)
+    if err == nil {
+        _, err = os.Stat(filePath)
+        if err != nil {
+            filePath = filepath.Join(config.GetConfig().Directory, file)
+            filePath, err = filepath.Abs(filePath)
+            if err == nil {
+                _, err = os.Stat(filePath)
+                if err != nil {
+                    fmt.Println("Invalid file path:", file)
+                    filePath = ""
+                }
+            } else {
+                fmt.Println("Invalid file path:", file)
+                filePath = ""
+            }
+        }
+    } else {
+        fmt.Println("Invalid file path:", file)
+        filePath = ""
+    }
+
+    return filePath
+}
+
 func main() {
     printing.PrintBanner()
     args := os.Args[1:]
@@ -40,7 +68,7 @@ func main() {
     if len(args) > 0 {
         file := ""
         if len(args) >= 2 {
-            file = args[1]
+            file = getFilePath(args[1])
         }
 
         switch args[0] {

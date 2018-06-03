@@ -106,12 +106,13 @@ func List(full bool, whichFile string) {
 
         if full {
             fmt.Println("Notes:")
+            fmt.Println("")
             for _, note := range notes {
                 printing.PrintNote(note)
             }
+        } else {
+            fmt.Println("")
         }
-
-        fmt.Println("")
     }
 }
 
