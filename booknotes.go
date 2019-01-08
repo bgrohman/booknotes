@@ -62,7 +62,6 @@ func getFilePath(file string) string {
 }
 
 func main() {
-    printing.PrintBanner()
     args := os.Args[1:]
 
     if len(args) > 0 {
@@ -83,11 +82,14 @@ func main() {
         case "words":
             core.WordCount(file)
         case "random":
+            printing.PrintBanner()
             core.RandomNote(file)
         case "help":
+            printing.PrintBanner()
             help()
         }
     } else {
+        printing.PrintBanner()
         help()
     }
 }
