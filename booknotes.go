@@ -4,9 +4,9 @@ import (
     "fmt"
     "os"
     "path/filepath"
-    "booknotes/config"
-    "booknotes/core"
-    "booknotes/printing"
+    "github.com/bgrohman/booknotes/config"
+    "github.com/bgrohman/booknotes/core"
+    "github.com/bgrohman/booknotes/printing"
 )
 
 func help() {

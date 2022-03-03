@@ -1,8 +1,8 @@
 package core
 
 import (
-    "booknotes/config"
-    "booknotes/printing"
+    "github.com/bgrohman/booknotes/config"
+    "github.com/bgrohman/booknotes/printing"
     "fmt"
     "io/ioutil"
     "log"

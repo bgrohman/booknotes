@@ -1,7 +1,7 @@
 package printing
 
 import (
-    "booknotes/config"
+    "github.com/bgrohman/booknotes/config"
     "fmt"
     "log"
     "math"

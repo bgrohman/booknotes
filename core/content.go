@@ -1,7 +1,7 @@
 package core
 
 import (
-    "booknotes/config"
+    "github.com/bgrohman/booknotes/config"
     "bufio"
     "fmt"
     "io/ioutil"
